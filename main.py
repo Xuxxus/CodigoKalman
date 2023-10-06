@@ -1,8 +1,93 @@
 import numpy as np
-from numpy import dot, ndarray
-import numpy.linalg as linalg
+from numpy import dot
 import math
 from filterpy.kalman import predict, update
+import time
+
+float_formartter = "{:.6f}".format
+np.set_printoptions(formatter={'float_kind':float_formartter})
+
+def get_quaternion_from_euler(roll, pitch, yaw):
+  """
+  Convert an Euler angle to a quaternion.
+
+  Input
+    :param roll: The roll (rotation around x-axis) angle in radians.
+    :param pitch: The pitch (rotation around y-axis) angle in radians.
+    :param yaw: The yaw (rotation around z-axis) angle in radians.
+
+  Output
+    :return qx, qy, qz, qw: The orientation in quaternion [x,y,z,w] format
+  """
+  qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+  qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+  qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+  qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+  return [qx, qy, qz, qw]
+
+def getCofactor(mat, temp, p, q, n):
+    i = 0
+    j = 0
+
+    # Looping for each element
+    # of the matrix
+    for row in range(n):
+
+        for col in range(n):
+
+            # Copying into temporary matrix
+            # only those element which are
+            # not in given row and column
+            if (row != p and col != q):
+
+                temp[i][j] = mat[row][col]
+                j += 1
+
+                # Row is filled, so increase
+                # row index and reset col index
+                if (j == n - 1):
+                    j = 0
+                    i += 1
+
+
+# Recursive function for
+# finding determinant of matrix.
+# n is current dimension of mat[][].
+def determinantOfMatrix(mat, n):
+    D = 0  # Initialize result
+
+    # Base case : if matrix
+    # contains single element
+    if (n == 1):
+        return mat[0][0]
+
+    # To store cofactors
+    temp = [[0 for x in range(n)]
+            for y in range(n)]
+
+    sign = 1  # To store sign multiplier
+
+    # Iterate for each
+    # element of first row
+    for f in range(n):
+        # Getting Cofactor of mat[0][f]
+        getCofactor(mat, temp, 0, f, n)
+        D += (sign * mat[0][f] *
+              determinantOfMatrix(temp, n - 1))
+
+        # terms are to be added
+        # with alternate sign
+        sign = -sign
+    return D
+
+
+def isInvertible(mat, n):
+    if (determinantOfMatrix(mat, n) != 0):
+        return True
+    else:
+        return False
+
 
 
 n_roll_real = 3
@@ -13,14 +98,15 @@ m_pitch_real = 0.1
 m_yaw_real = 0.1
 i = 0
 count = 0
-x_barra = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-rateCalibrationRoll = [-1.51, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-rateCalibrationPitch = [1.21, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-rateCalibrationYaw = [-0.49, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+x_barra = []
+tempo = []
+rateCalibrationRoll = [-0.13, -2.85, 1.69, -4.2, 7.55, -3.95, 2.65, -26.7, -1.0, -3.65, 0.0, 0.0, 0.0]
+rateCalibrationPitch = [0.83, 1.68, -0.89, 2.45, 1.07, -2.74, -3.26, -1.29, 0.72, -0.31, 0.0, 0.0, 0.0]
+rateCalibrationYaw = [0.6, 0.53, 0.24, -1.15, 1.87, -0.34, -0.59, 0.65, 0.62, 0.45, 0.0, 0.0, 0.0]
 
-acelCalibrationRoll = [1.03, 0.94, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-acelCalibrationPitch = [0.99, 1.02, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-acelCalibrationYaw = [1.07, 0.97, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+acelCalibrationRoll = [1.04, 1.03, 1.04, 1.03, 1.0, 1.03, 1.06, 1.04, 1.03, 0.96, 0.0, 0.0, 0.0]
+acelCalibrationPitch = [0.98, 0.98, 0.99, 1.0, 0.99, 1.0, 0.99, 0.98, 0.99, 1.01, 0.0, 0.0, 0.0]
+acelCalibrationYaw = [0.95, 0.94, 0.94, 0.95, 0.93, 0.99, 0.74, 1.0, 0.95, 0.89, 0.0, 0.0, 0.0]
 
 # dados = [1,2,3,4,5,6,7,8,9,2,1,2,3,4]
 # Impelmentar busca de arquivos e leitura (pandas)
@@ -47,10 +133,25 @@ u = np.array([[1.0],
 a_shape = (6, 6)
 P = np.zeros(a_shape)
 
+nstate_nobs = (6, 2)
+nobs_nobs = (2, 2)
+n_z = (2,1)
+
+S = np.zeros(nobs_nobs)
+k = np.zeros(nstate_nobs)
+z = np.zeros(n_z)
+
 with open('Teste.txt') as f:
     contents = f.read()
     dados = contents.split(',')
     print(dados)
+    print(len(dados))
+
+n_sensor = int(input("Insira o número de sensores: "))
+nome_sensores = []
+for i in range(n_sensor):
+    nome_sensores.append(str(input("Nome do sensor %d" %(i+1))))
+
 
 for i in range(0, len(dados), 7):
     Ti = float(dados[i + 6])
@@ -76,11 +177,7 @@ for i in range(0, len(dados), 7):
                   [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
                   [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
 
-    #nstate_nobs = (6, 2)
-    #nobs_nobs = (2, 2)
 
-    #S = np.zeros(nobs_nobs)
-    #k = np.zeros(nstate_nobs)
 
     # Recebimento -> ACCX, ACCY, ACCZ, GYRX, GYRY, GYRXZ e Tempo
     # dados[i], dados[i+1], dados[i+2], dados[i+3], dados[i+4], dados[i+5], dados[i+6]
@@ -97,6 +194,9 @@ for i in range(0, len(dados), 7):
                 (float(dados[i + 2]) - acelCalibrationYaw[count]) * (
                 float(dados[i + 2]) - acelCalibrationYaw[count])))) * (1 / (math.pi / 180))
 
+    z[0] = angleRoll
+    z[1] = anglePitch
+
     # rateRoll = (Convert.ToDouble(list[i + 3]) / 131) - rateCalibrationRoll[count];
     # ratePitch = (Convert.ToDouble(list[i + 4]) / 131) - rateCalibrationPitch[count];
     # rateYaw = (Convert.ToDouble(list[i + 5]) / 131) - rateCalibrationYaw[count];
@@ -105,6 +205,10 @@ for i in range(0, len(dados), 7):
     ratePitch = (float(dados[i + 4]) / 131) - rateCalibrationPitch[count]
     rateYaw = (float(dados[i + 5]) / 131) - rateCalibrationYaw[count]
 
+    u[0] = rateRoll
+    u[1] = ratePitch
+    u[2] = rateYaw
+
     # y = np.matmul(a, x)
     # z = np.matmul(b, u)
     # p = y + z
@@ -112,29 +216,53 @@ for i in range(0, len(dados), 7):
     # print(np.array(y))
     # print(np.array(z))
     x, P = predict(x, P, a, q, u, b)
-    print("----------------Predict-----------------")
+    '''print("----------------Predict-----------------")
     print('x =', x)
-    print('P =', P)
+    print('P =', P)'''
 
     S = dot(dot(c, P), c.T) + r
 
-    is_nosingular = bool(S.inv(S))
+    is_nosingular = determinantOfMatrix(S, 2) #Arrumar esse boolean
 
     k = dot(dot(P, c.T), S)
 
     if is_nosingular:
-        x, P = update(x, P, 1, r, c)
-        print("----------------Update-----------------")
-        print('x =', x)
-        print('P =', P)
+        x, P = update(x, P, z, r, c)
+        #print("----------------Update-----------------")
+        #print('x =', x)
+        #print('P =', P)
 
+    #armazenamento dos quaternion no vetor x_barra
+    x_barra.append(get_quaternion_from_euler(x[0][0],x[1][0],x[2][0]))
+
+    count += 1
+
+    #metodo para padronizar os tempos, a cada 3 leituras ele pega o primeiro tempo para manter tudo na mesma linha como se fosse no msm instante (variação de 0.001 seg) não influencia
+    if (i+1)%n_sensor == 0:
+        tempo.append(Ti)
+        count = 0
 
 
     # print("Array %d" % (count + 1))
     # print(np.array(p))
-    # x_barra[count] = np.array(p)
+    #x_barra[count] = np.array(p)
 
-    count += 1
 
+#print("Xbarra: ",x_barra)
 # print("Array xbarra: ")
 # print(x_barra[0])
+#print(len(tempo))
+#print(len(x_barra))
+
+### criação de arquivo txt e escrever nele ###
+#f1 = open('opensimTeste.txt', 'w')
+#f1.write('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
+#for k in range(len(x_barra), 3):
+    #f1.write(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+
+### Print Não Funcionaaaaaa vai toma no cu pq pula o loop for
+print('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
+for i in range(len(x_barra), 3):
+    print(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+
+print("terminou")
