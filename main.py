@@ -254,15 +254,17 @@ for i in range(0, len(dados), 7):
 #print(len(tempo))
 #print(len(x_barra))
 
-### criação de arquivo txt e escrever nele ###
-#f1 = open('opensimTeste.txt', 'w')
-#f1.write('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
-#for k in range(len(x_barra), 3):
-    #f1.write(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+#criação de arquivo txt e escrever nele (necessário arquivo opensimTeste.txt vazio no msm diretório)
+#Necessário criar um for pra printar os quartenions de acordo com o n de sensores
 
-### Print Não Funcionaaaaaa vai toma no cu pq pula o loop for
-print('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
-for i in range(len(x_barra), 3):
-    print(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+f1 = open('opensimTeste.txt', 'w')
+f1.write('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
+for k in range(0, len(x_barra), 3):
+    f1.write(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+
+#Print Não Funcionaaaaaa pq pula o loop for --- Funcionou :)
+#print('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
+#for i in range(0, len(x_barra), 3):
+    #print(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
 
 print("terminou")
