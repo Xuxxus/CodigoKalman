@@ -26,6 +26,7 @@ def get_quaternion_from_euler(roll, pitch, yaw):
 
   return [qx, qy, qz, qw]
 
+
 def getCofactor(mat, temp, p, q, n):
     i = 0
     j = 0
@@ -258,10 +259,13 @@ for i in range(0, len(dados), 7):
 #Necessário criar um for pra printar os quartenions de acordo com o n de sensores
 
 f1 = open('opensimTeste.txt', 'w')
-f1.write('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
+f1.write('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2] + "\n")
 for k in range(0, len(x_barra), 3):
-    f1.write(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
-
+    f1.write(str(tempo[k // 3]))
+    for j in range(n_sensor):
+        f1.write("   " + str(x_barra[k + j][0]) + "," + str(x_barra[k + j][1]) + "," + str(x_barra[k + j][2]) + "," + str(x_barra[k + j][3]))
+             # "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]) + "\n")
+    f1.write("\n")
 #Print Não Funcionaaaaaa pq pula o loop for --- Funcionou :)
 #print('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
 #for i in range(0, len(x_barra), 3):
