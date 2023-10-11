@@ -2,10 +2,16 @@ import numpy as np
 from numpy import dot
 import math
 from filterpy.kalman import predict, update
+import matplotlib.pyplot as plt
 
 float_formartter = "{:.6f}".format
 np.set_printoptions(formatter={'float_kind':float_formartter})
-
+anglepitchs = []
+anglerolls = []
+x_barra1 = []
+kalman0 = []
+kalman1 = []
+tempos = []
 
 def get_quaternion_from_euler(roll, pitch, yaw):
   """
@@ -196,13 +202,13 @@ for i in range(0, len(dados), 7):
     angleRoll = math.atan((float(dados[i + 1]) - acelCalibrationPitch[count]) / math.sqrt(
         ((float(dados[i]) - acelCalibrationRoll[count]) * (float(dados[i]) - acelCalibrationRoll[count])) + (
                 (float(dados[i + 2]) - acelCalibrationYaw[count]) * (
-                float(dados[i + 2]) - acelCalibrationYaw[count])))) * (1 / (math.pi / 180))
+                float(dados[i + 2]) - acelCalibrationYaw[count]))))
 
     # AnglePitch = -atan(AccX/sqrt(AccY*AccY + AccZ*AccZ))*1/(3.14159265/180);
     anglePitch = -math.atan((float(dados[i]) - acelCalibrationRoll[count]) / math.sqrt(
         ((float(dados[i + 1]) - acelCalibrationPitch[count]) * (float(dados[i + 1]) - acelCalibrationPitch[count])) + (
                 (float(dados[i + 2]) - acelCalibrationYaw[count]) * (
-                float(dados[i + 2]) - acelCalibrationYaw[count])))) * (1 / (math.pi / 180))
+                float(dados[i + 2]) - acelCalibrationYaw[count]))))
 
     #angleYaw =
 
@@ -245,14 +251,21 @@ for i in range(0, len(dados), 7):
         #print('P =', P)
 
     x_barra.append(get_quaternion_from_euler(x[0][0],x[1][0],x[2][0]))
+    if (i+1)%2 == 0:
+        x_barra1.append(get_quaternion_from_euler(angleRoll,anglePitch,0))
+        anglepitchs.append(anglePitch)
+        anglerolls.append(angleRoll)
+        kalman0.append(x[0][0])
+        kalman1.append(x[1][0])
+        tempos.append(Ti)
 
     count += 1
     if (i+1)%n_sensor == 0:
         tempo.append(Ti)
         count = 0
 
-    if i == 0:
-        print("Ângulo de euler inicial: " + str(x[0][0]) + str(x[1][0]) + str(x[2][0]))
+    if i == 1400:
+        print("Ângulo de euler inicial: " + str(x[0][0]) + " " + str(x[1][0]) + " " + str(x[2][0]))
     # print("Array %d" % (count + 1))
     # print(np.array(p))
     #x_barra[count] = np.array(p)
@@ -261,7 +274,7 @@ for i in range(0, len(dados), 7):
 #print("Xbarra: ",x_barra)
 # print("Array xbarra: ")
 # print(x_barra[0])
-#print(len(tempo))
+print(len(tempo))
 print(len(x_barra))
 
 for i in range(len(x_barra)):
@@ -293,6 +306,18 @@ for k in range(0, len(x_barra), 3):
         f1.write("\t" + str(x_barra[k + j][0]) + "," + str(x_barra[k + j][1]) + "," + str(x_barra[k + j][2]) + "," + str(x_barra[k + j][3]))
              # "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]) + "\n")
     f1.write("\n")
+
+plt.figure().set_figwidth(20)
+x1 = plt.plot(tempos, anglepitchs)
+x2 =plt.plot(tempos, anglerolls)
+x3 = plt.plot(tempos, kalman0)
+x4 = plt.plot(tempos, kalman1)
+plt.setp(x1, color='r', linewidth=1.0)
+plt.setp(x2, color='b', linewidth=1.0)
+plt.setp(x3, color='g', linewidth=1.0)
+plt.setp(x4, color='k', linewidth=1.0)
+plt.xticks(np.arange(min(tempos), max(tempos)+1, 0.1))
+plt.show()
 
 
 
