@@ -2,10 +2,10 @@ import numpy as np
 from numpy import dot
 import math
 from filterpy.kalman import predict, update
-import time
 
 float_formartter = "{:.6f}".format
 np.set_printoptions(formatter={'float_kind':float_formartter})
+
 
 def get_quaternion_from_euler(roll, pitch, yaw):
   """
@@ -100,13 +100,23 @@ i = 0
 count = 0
 x_barra = []
 tempo = []
+'''
 rateCalibrationRoll = [-0.13, -2.85, 1.69, -4.2, 7.55, -3.95, 2.65, -26.7, -1.0, -3.65, 0.0, 0.0, 0.0]
 rateCalibrationPitch = [0.83, 1.68, -0.89, 2.45, 1.07, -2.74, -3.26, -1.29, 0.72, -0.31, 0.0, 0.0, 0.0]
-rateCalibrationYaw = [0.6, 0.53, 0.24, -1.15, 1.87, -0.34, -0.59, 0.65, 0.62, 0.45, 0.0, 0.0, 0.0]
+rateCalibrationYaw = [0.6, 0.53, 0.24, -1.15, 1.87, -0.34, -0.59, 0.65, 0.62, 0.45, 0.0, 0.0, 0.0]'''
 
+rateCalibrationRoll = [-3.95, -1.0, 1.69, -4.2, 7.55, -3.95, 2.65, -26.7, -1.0, -3.65, 0.0, 0.0, 0.0]
+rateCalibrationPitch = [-2.74, 0.72, -0.89, 2.45, 1.07, -2.74, -3.26, -1.29, 0.72, -0.31, 0.0, 0.0, 0.0]
+rateCalibrationYaw = [-0.34, 0.62, 0.24, -1.15, 1.87, -0.34, -0.59, 0.65, 0.62, 0.45, 0.0, 0.0, 0.0]
+
+'''
 acelCalibrationRoll = [1.04, 1.03, 1.04, 1.03, 1.0, 1.03, 1.06, 1.04, 1.03, 0.96, 0.0, 0.0, 0.0]
 acelCalibrationPitch = [0.98, 0.98, 0.99, 1.0, 0.99, 1.0, 0.99, 0.98, 0.99, 1.01, 0.0, 0.0, 0.0]
-acelCalibrationYaw = [0.95, 0.94, 0.94, 0.95, 0.93, 0.99, 0.74, 1.0, 0.95, 0.89, 0.0, 0.0, 0.0]
+acelCalibrationYaw = [0.95, 0.94, 0.94, 0.95, 0.93, 0.99, 0.74, 1.0, 0.95, 0.89, 0.0, 0.0, 0.0]'''
+
+acelCalibrationRoll = [1.03, 1.03, 1.04, 1.03, 1.0, 1.03, 1.06, 1.04, 1.03, 0.96, 0.0, 0.0, 0.0]
+acelCalibrationPitch = [1.0, 0.99, 0.99, 1.0, 0.99, 1.0, 0.99, 0.98, 0.99, 1.01, 0.0, 0.0, 0.0]
+acelCalibrationYaw = [0.99, 0.95, 0.94, 0.95, 0.93, 0.99, 0.74, 1.0, 0.95, 0.89, 0.0, 0.0, 0.0]
 
 # dados = [1,2,3,4,5,6,7,8,9,2,1,2,3,4]
 # Impelmentar busca de arquivos e leitura (pandas)
@@ -150,7 +160,7 @@ with open('Teste.txt') as f:
 n_sensor = int(input("Insira o número de sensores: "))
 nome_sensores = []
 for i in range(n_sensor):
-    nome_sensores.append(str(input("Nome do sensor %d" %(i+1))))
+    nome_sensores.append(str(input("Nome do sensor %d: " %(i+1))))
 
 
 for i in range(0, len(dados), 7):
@@ -194,6 +204,8 @@ for i in range(0, len(dados), 7):
                 (float(dados[i + 2]) - acelCalibrationYaw[count]) * (
                 float(dados[i + 2]) - acelCalibrationYaw[count])))) * (1 / (math.pi / 180))
 
+    #angleYaw =
+
     z[0] = angleRoll
     z[1] = anglePitch
 
@@ -232,17 +244,15 @@ for i in range(0, len(dados), 7):
         #print('x =', x)
         #print('P =', P)
 
-    #armazenamento dos quaternion no vetor x_barra
     x_barra.append(get_quaternion_from_euler(x[0][0],x[1][0],x[2][0]))
 
     count += 1
-
-    #metodo para padronizar os tempos, a cada 3 leituras ele pega o primeiro tempo para manter tudo na mesma linha como se fosse no msm instante (variação de 0.001 seg) não influencia
     if (i+1)%n_sensor == 0:
         tempo.append(Ti)
         count = 0
 
-
+    if i == 0:
+        print("Ângulo de euler inicial: " + str(x[0][0]) + str(x[1][0]) + str(x[2][0]))
     # print("Array %d" % (count + 1))
     # print(np.array(p))
     #x_barra[count] = np.array(p)
@@ -252,19 +262,38 @@ for i in range(0, len(dados), 7):
 # print("Array xbarra: ")
 # print(x_barra[0])
 #print(len(tempo))
-#print(len(x_barra))
+print(len(x_barra))
 
-#criação de arquivo txt e escrever nele (necessário arquivo opensimTeste.txt vazio no msm diretório)
-#Necessário criar um for pra printar os quartenions de acordo com o n de sensores
+for i in range(len(x_barra)):
+    for j in range(4):
+        x_barra[i][j] = "%.16f" % x_barra[i][j]
 
-f1 = open('opensimTeste.txt', 'w')
-f1.write('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
+#time.sleep(10)
+
+f1 = open('posicao_inicial.sto', 'w')
+f1.write("DataRate=100.000000\nDataType=Quaternion\nversion=3\nOpenSimVersion=4.4\nendheader\n")
+f1.write('time')
+for l in range(len(nome_sensores)):
+    f1.write('\t' + nome_sensores[l])
+f1.write("\n")
+f1.write(str(tempo[0]))
+for n in range(n_sensor):
+    f1.write("\t" + str(x_barra[n][0]) + "," + str(x_barra[n][1]) + "," + str(x_barra[n][2]) + "," + str(x_barra[n][3]))
+
+
+f1 = open('opensimTeste.sto', 'w')
+f1.write("DataRate=100.000000\nDataType=Quaternion\nversion=3\nOpenSimVersion=4.4\nendheader\n")
+f1.write('time')
+for l in range(len(nome_sensores)):
+    f1.write('\t' + nome_sensores[l])
+f1.write("\n")
 for k in range(0, len(x_barra), 3):
-    f1.write(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+    f1.write(str(tempo[k // 3]))
+    for j in range(n_sensor):
+        f1.write("\t" + str(x_barra[k + j][0]) + "," + str(x_barra[k + j][1]) + "," + str(x_barra[k + j][2]) + "," + str(x_barra[k + j][3]))
+             # "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]) + "\n")
+    f1.write("\n")
 
-#Print Não Funcionaaaaaa pq pula o loop for --- Funcionou :)
-#print('time  ' + nome_sensores[0] + "    " + nome_sensores[1] + "  " + nome_sensores[2])
-#for i in range(0, len(x_barra), 3):
-    #print(str(tempo[k//3]) + "   " + str(x_barra[k][0]) + "," + str(x_barra[k][1]) + "," + str(x_barra[k][2]) + "," + str(x_barra[k + 1][3]) + "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]))
+
 
 print("terminou")
