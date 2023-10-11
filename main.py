@@ -288,7 +288,7 @@ for l in range(len(nome_sensores)):
     f1.write('\t' + nome_sensores[l])
 f1.write("\n")
 for k in range(0, len(x_barra), 3):
-    f1.write(str(tempo[k // 3]))
+    f1.write(str(tempo[k // n_sensor]))
     for j in range(n_sensor):
         f1.write("\t" + str(x_barra[k + j][0]) + "," + str(x_barra[k + j][1]) + "," + str(x_barra[k + j][2]) + "," + str(x_barra[k + j][3]))
              # "  " + str(x_barra[k + 1][0]) + "," + str(x_barra[k + 1][1]) + "," + str(x_barra[k + 1][2]) + "," + str(x_barra[k + 1][3]) + "    " + str(x_barra[k + 2][0]) + "," + str(x_barra[k + 2][1]) + "," + str(x_barra[k + 2][2]) + "," + str(x_barra[k + 2][3]) + "\n")
