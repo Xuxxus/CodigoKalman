@@ -44,12 +44,12 @@ If you want to contribute to this data processing code, follow these steps:
 3. Make your changes and commit them:
    
    ```bash
-git commit -m 'Add your feature'
+   git commit -m 'Add your feature'
 
 4. Push to the branch:
 
    ```bash
-git push origin feature-name
+   git push origin feature-name
 
 5. Create a pull request. Please, be clear about your changes.
 
