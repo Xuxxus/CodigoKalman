@@ -14,7 +14,7 @@ The `Lab-Version` tag represents a version of the code used in the project, demo
 
 - Google Colab account
 - Text file containing IMU data
-- Python 3.11
+- Python 3.10.12
 
 ### Usage
 
@@ -44,12 +44,12 @@ If you want to contribute to this data processing code, follow these steps:
 3. Make your changes and commit them:
    
    ```bash
-git commit -m 'Add your feature'
+   git commit -m 'Add your feature'
 
 4. Push to the branch:
 
    ```bash
-git push origin feature-name
+   git push origin feature-name
 
 5. Create a pull request. Please, be clear about your changes.
 
@@ -57,6 +57,8 @@ git push origin feature-name
 [Embedded System Repository](https://github.com/Xuxxus/MovementSensoring): Repository for the Arduino code.
 
 [Arduino Calibration Repository](https://github.com/Xuxxus/Calibracao-Accel): Repository for the IMU calibration using Arduino.
+
+[PCB Repository](https://github.com/Xuxxus/ConnectionBoard): Repository for the PCB used in this project.
 
 ## Acknowledgments
 Professors Wellington Pinheiro, MSc. and Maria Claudia Castro, PhD. from FEI University Center for their absolute great job on guiding our project.
