@@ -58,6 +58,8 @@ If you want to contribute to this data processing code, follow these steps:
 
 [Arduino Calibration Repository](https://github.com/Xuxxus/Calibracao-Accel): Repository for the IMU calibration using Arduino.
 
+[PCB Repository](https://github.com/Xuxxus/ConnectionBoard): Repository for the PCB used in this project.
+
 ## Acknowledgments
 Professors Wellington Pinheiro, MSc. and Maria Claudia Castro, PhD. from FEI University Center for their absolute great job on guiding our project.
 
