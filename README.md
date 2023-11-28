@@ -14,7 +14,7 @@ The `Lab-Version` tag represents a version of the code used in the project, demo
 
 - Google Colab account
 - Text file containing IMU data
-- Python 3.11
+- Python 3.10.12
 
 ### Usage
 
